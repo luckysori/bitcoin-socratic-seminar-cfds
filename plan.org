@@ -1,0 +1,39 @@
+* Introduction
+** What is it?
+- CFDs on Bitcoin.
+- Betting on the future price of BTC.
+** CFD
+- Properties of CFDs
+** Why would you do this?
+- Same reason why you would want to do CFDs in conventional finance.
+- Non-custodial: your wallet*, your keys.
+- No middleman: p2p.
+- Powered by Bitcoin.
+- No counterparty risk.
+- Accountless.
+* Protocol
+** DLCs
+*** Protocol from `dlcspecs`
+- Not Dryja's protocol.
+**** Adaptor signatures
+**** CETs
+
+** Layer-2
+** Collaborative Settlement
+- Worst-case scenario cryptography
+  We only use CETs if we can't agree with our counterparty (or they're offline)
+* Demo (5 minutes)
+- Refer to wallet with funds
+  Normally you'd have to fund the wallet
+- Take offer from Philipp's maker
+  Talk about the conditions of the contract.
+- Wait for CFD set-up to finish
+  Refer to exchange of signatures and keys, as explained before.
+- Show lock transaction in block explorer
+- Talk about the different values listed
+  Explain that the UI is still WIP.
+- Close collaboratively
+  - Imagine that the price has moved in our favour and we would be making a profit
+  - Of course, like other platforms offering CFDs (e.g. BitMEX), the maker charges a sort of maintenance fee. To make a profit we have to take that into account too
+- Show collab settlement transaction on-chain
+  Eventually the money returns to the wallet, from which you can withdraw at any time
