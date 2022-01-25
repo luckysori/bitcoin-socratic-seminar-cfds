@@ -1,8 +1,10 @@
-* Introduction
-** Personal
+* Title page
 Thank you to the organisers for giving us a chance to present our work. My name is Lucas and I'm here on behalf of CoBloX to show you Itchysats.
+* What is Itchysats?
 ** What is Itchysats?
 Itchysats (in its current state) is a React web application with a Rust daemon running in the background. Using Itchysats you can connect to a maker and set up a Bitcoin CFD (or Contract For Difference) with them.
+
+We were recently added to the Umbrel App Store and we intend to target similar platforms such as RaspiBlitz.
 ** What is a CFD?
 A CFD is a financial instrument which involves two parties, a maker and a taker, who set up a bet on whether the price of an asset will rise or fall. To create the contract, the taker provides their margin in the form of collateral, and borrows the rest from the maker, creating leverage. These contracts don't have an expiry date, but a taker's position may be liquidated if they fail to respond to a margin call from the maker.
 ** Bitcoin CFDs on Itchysats
@@ -20,7 +22,7 @@ No counterparty risk: the protocol (which I'll describe shortly) ensures that bo
 
 It is accountless: you boot up Itchysats, deposit some coins into your local wallet and you're ready to trade.
 * Protocol
-Instead of describing the current protocol in full, I'm gonna walk you through the different iterations we went through, for clarity. Each step should be like adding a feature.
+Instead of describing the current protocol in full, I'm gonna walk you through the different iterations we went through, for clarity. Each step should be like adding a feature. We also wrote a blog post which follows a similar structure and may give you extra information. I'll post a link at the end of the presentation.
 ** Oneshot CFDs
 *** Counterparty risk
 Firstly, we want our protocol to ensure that both parties actually have the coins they say they do, which is why the protocol will start with the publication of a lock transaction with a 2-of-2 multisig output where all the collateral goes. This deals with the counterparty risk.

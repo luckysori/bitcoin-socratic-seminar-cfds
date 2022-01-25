@@ -15,7 +15,7 @@
 #+BEAMER_HEADER: \institute[]{COMIT, CoBloX}
 #+BEAMER_HEADER: \author[lucas@coblox.tech]{Lucas Soriano del Pino}
 
-#+OPTIONS: H:1 toc:t num:t inline:t tasks:done
+#+OPTIONS: H:2 toc:t num:t inline:t tasks:done
 #+startup: beamer
 #+LATEX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [presentation]
@@ -27,30 +27,86 @@
 #+BEAMER_INNER_THEME:
 #+BEAMER_OUTER_THEME:
 #+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsection]\end{frame}}
-#+BEAMER_HEADER: \title[Atomic swaps between BTC and XMR]{Atomic swaps between Bitcoin and Monero}
+#+BEAMER_HEADER: \title[Itchysats: Bitcoin CFDs]{Itchysats: Bitcoin CFDs}
 #+BEAMER_HEADER: \setbeamertemplate{navigation symbols}{}
 
 #+BEAMER: \beamerdefaultoverlayspecification{<+->}
 
 # Presenting at 7pm on Tuesday, 25th of January, 2022
-* Me
-# #+attr_html: :width 150px
-# #+attr_latex: :width 150px
-# [[./assets/giving-credit.jpg]]
 * What is Itchysats?
+** What is Itchysats?
+#+attr_html: :width 250px
+#+attr_latex: :width 250px
+[[./assets/itchysats-screenshot.png]]
 ** What is a CFD?
+- Derivative
+- Bet on the price of an asset in the future
+- Leverage
+- No expiry date
+- Margin call
+** Potential profits (and losses)
+[[./assets/CFD-101.png]]
 ** Bitcoin CFDs on Itchysats
-** Why care about Itchysats?
-* How does Itchysats work?
-** Oneshot CFDs
-*** Counterpaty risk
-*** Enforcing the bet
-**** DLC
-**** Olivia
-**** Transactions
-**** Payout curve
+- Like conventional CFDs
+- Bitcoin as underlying asset
+- Can only go long (shorting soon TM)
+- Long can /double-dip/
+** BitMEX already does this!
+But Itchysats is:
+- Non-custodial
+- Peer-to-peer
+- Built on top of Bitcoin
+- Free of counterparty risk
+- Accountless
+* How does it work?
+** Example
+- Taker goes long: bets 0.5 BTC that BTC >= 40k USD
+- Maker goes short: bets 0.5 BTC that BTC < 40k USD
+- Winner takes all
+** Counterparty risk
+- 1st step on chain: lock up margin as collateral
+- 2-of-2 multisig output
+** Enforcing the bet
+- Spend condition based on external information
+- Settle bet without collaboration
+** DLC (Discreet Log Contract)
+- 2-of-2 multisig
+- Spent according to an oracle
+- Oracle is oblivious
+- Privacy-preserving
+- /dlcspecs/
+** Olivia
+Oracle server made and hosted by Lloyd!
+*** In practice
+- Olivia identified by ~P~
+- Olivia announces future attestation, including a public nonce ~R~
+- Itchysats uses ~P~, ~R~ and prices to lock spending conditions for DLC
+- Olivia attests to price using ~p~ and ~r~, enabling one spending path
+** Transactions
+[[./assets/oneshot_cfd.jpg]]
+** Payout curve
+[[./assets/payout-curve.png]]
 ** Perpetual CFDs
-*** Channels
-** The actual protocol
+- CFDs aren't meant to expire
+- Can't get rid of the deadline
+- Can we push the deadline?
+** Using channels
+- Look at Lightning
+- We have experience: implemented Generalized Bitcoin-Compatible Channels PoC
+** More transactions
+[[./assets/perpetual_cfd.jpg]]
+** Optional collaboration
+- We have to wait to close our position
+- Introduce optional transaction
+- Olivia isn't involved
+** All of the transactions
+[[./assets/collab_settlement_cfd.jpg]]
+* Roadmap
+** Roadmap
+#+attr_html: :width 200px
+#+attr_latex: :width 200px
+[[./assets/itchysats-roadmap.png]]
 * Demo
 * Questions
+** Ask us anything
+[[./assets/q-and-a.jpg]]
