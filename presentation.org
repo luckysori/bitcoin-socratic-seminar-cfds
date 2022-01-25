@@ -1,0 +1,56 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+OPTIONS: author:t broken-links:nil c:nil creator:nil
+#+OPTIONS: d:(not "LOGBOOK") date:t e:t email:nil f:t num:t
+#+OPTIONS: p:nil pri:nil prop:nil stat:t tags:t tex:t
+#+OPTIONS: timestamp:t |:t
+#+TITLE: Itchysats: Bitcoin CFDs
+#+DATE: 2022-01-25
+#+AUTHOR: Lucas Soriano del Pino
+#+INSTITUTE: CoBloX, COMIT
+#+EMAIL: lucas@coblox.tech
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 27.0.50 (Org mode 9.1.9)
+#+BEAMER_HEADER: \institute[]{COMIT, CoBloX}
+#+BEAMER_HEADER: \author[lucas@coblox.tech]{Lucas Soriano del Pino}
+
+#+OPTIONS: H:1 toc:t num:t inline:t tasks:done
+#+startup: beamer
+#+LATEX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [presentation]
+
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+#+BEAMER_THEME: Madrid
+#+BEAMER_COLOR_THEME:
+#+BEAMER_FONT_THEME:
+#+BEAMER_INNER_THEME:
+#+BEAMER_OUTER_THEME:
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsection]\end{frame}}
+#+BEAMER_HEADER: \title[Atomic swaps between BTC and XMR]{Atomic swaps between Bitcoin and Monero}
+#+BEAMER_HEADER: \setbeamertemplate{navigation symbols}{}
+
+#+BEAMER: \beamerdefaultoverlayspecification{<+->}
+
+# Presenting at 7pm on Tuesday, 25th of January, 2022
+* Me
+# #+attr_html: :width 150px
+# #+attr_latex: :width 150px
+# [[./assets/giving-credit.jpg]]
+* What is Itchysats?
+** What is a CFD?
+** Bitcoin CFDs on Itchysats
+** Why care about Itchysats?
+* How does Itchysats work?
+** Oneshot CFDs
+*** Counterpaty risk
+*** Enforcing the bet
+**** DLC
+**** Olivia
+**** Transactions
+**** Payout curve
+** Perpetual CFDs
+*** Channels
+** The actual protocol
+* Demo
+* Questions

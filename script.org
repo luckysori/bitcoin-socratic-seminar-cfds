@@ -1,27 +1,64 @@
 * Introduction
-** What is it?
-- CFDs on Bitcoin.
-- Betting on the future price of BTC.
-** CFD
-- Properties of CFDs
-** Why would you do this?
-- Same reason why you would want to do CFDs in conventional finance.
-- Non-custodial: your wallet*, your keys.
-- No middleman: p2p.
-- Powered by Bitcoin.
-- No counterparty risk.
-- Accountless.
-* Protocol
-** DLCs
-*** Protocol from `dlcspecs`
-- Not Dryja's protocol.
-**** Adaptor signatures
-**** CETs
+** Personal
+Thank you to the organisers for giving us a chance to present our work. My name is Lucas and I'm here on behalf of CoBloX to show you Itchysats.
+** What is Itchysats?
+Itchysats (in its current state) is a React web application with a Rust daemon running in the background. Using Itchysats you can connect to a maker and set up a Bitcoin CFD (or Contract For Difference) with them.
+** What is a CFD?
+A CFD is a financial instrument which involves two parties, a maker and a taker, who set up a bet on whether the price of an asset will rise or fall. To create the contract, the taker provides their margin in the form of collateral, and borrows the rest from the maker, creating leverage. These contracts don't have an expiry date, but a taker's position may be liquidated if they fail to respond to a margin call from the maker.
+** Bitcoin CFDs on Itchysats
+On Itchysats we've reproduced this derivative from conventional finance, using bitcoin as the underlying asset. Using our tool you put up margin in the form of bitcoin, to set up a CFD with our automated maker. At the moment you can only set up long positions, but in the very near future you will also be able to go short. With a long position, if the price of BTC goes up you make a profit, both because the value of your bitcoin increased, but also because the maker will have to give you some of their own bitcoin for "winning the bet".
+** Why should you care?
+Cryptocurrency exchanges such as BitMEX already offer this sort of product, so why use Itchysats?
 
-** Layer-2
-** Collaborative Settlement
-- Worst-case scenario cryptography
-  We only use CETs if we can't agree with our counterparty (or they're offline)
+This is a non-custodial solution. You don't have to trust anyone with your coins. Because we have to sign hundreds of transactions per CFD, the tool comes with its own local wallet, but the keys belong to you. And you can withdraw from this wallet at any time.
+
+There is no middleman, no broker. You trade with your counterparty directly.
+
+It is built on top of Bitcoin.
+
+No counterparty risk: the protocol (which I'll describe shortly) ensures that both parties are fully backed.
+
+It is accountless: you boot up Itchysats, deposit some coins into your local wallet and you're ready to trade.
+* Protocol
+Instead of describing the current protocol in full, I'm gonna walk you through the different iterations we went through, for clarity. Each step should be like adding a feature.
+** Oneshot CFDs
+*** Counterparty risk
+Firstly, we want our protocol to ensure that both parties actually have the coins they say they do, which is why the protocol will start with the publication of a lock transaction with a 2-of-2 multisig output where all the collateral goes. This deals with the counterparty risk.
+*** Enforcing the bet
+For simplicity we could set up a binary CFD: long wins all if price of BTC is greater than 40k USD; short takes everything otherwise.
+
+Because we want to uphold the values of Bitcoin, we must be able to settle the bet without needing to trust our counterparty. This is where the DLC protocol comes in.
+**** DLC
+I think most of you will have heard of DLCs in the past, but let me give you a quick refresher. A DLC (or Discreet Log Contract) is an output which can be spent depending on the outcome of an event according to a trusted third party, commonly referred to as an oracle. In the context of Bitcoin CFDs, our event would be the price of BTC in USD at a particular time in the future.
+
+DLC protocols are interesting because the DLC is indistinguishable from a regular multisig output, and the oracle operates without knowing who is using their attestation for what.
+**** Olivia
+For Itchysats we're using Olivia as our oracle, which was implemented and is run by Lloyd himself. What Olivia does is cryptographically attest to the price of BTC in USD every hour.
+**** Transactions
+When we set up the DLC in Itchysats we take Olivia's commitment to a future attestation of the price (this is called the announcement) and lock spend transactions to the DLC (called CETs) based on different prices that Olivia could attest to. In our simple example, we could have one CET giving all the DLC output to the party going long if Olivia attests to a price over 40k; and another CET if Olivia's attestation is for a price below 40k.
+
+You can see that there is another spend path for our DLC. Ideally this is never used, but it exists in case the oracle is down or none of the CETs are unlocked with the corresponding attestation. It just returns the coins back to their owners, minus transaction fees.
+**** Payout curve (optional)
+In practice CFDs aren't binary, so...
+** Perpetual CFDs
+At the beginning I talked about how CFDs are meant to have no expiry: they should live for as long as both parties want to, or if one of the parties gets margin called. Our protocol only works because we have a deadline: the time at which the oracle publishes the relevant attestation, unlocking a particular CET.
+
+Since the deadline is necessary to enforce the bet, we need a mechanism to push the deadline further into the future. Maker and taker could simply get together and collaborate to spend the lock transaction into a new lock transaction, with a whole new set of CETs based on a different attestation from Olivia. But this would incur in transaction fees and it would be slow. We know how to solve this problem though.
+*** Channels
+We applied our knowledge of channels (we implemented a PoC for Generalized Bitcoin-Compatible Channels in the past) and modified the protocol to allow for arbitrarily many updates to the CFD.
+
+Instead of placing the DLC output on the lock transaction, we introduce an intermediary commitment transaction which holds the DLC now. The CETs spend from this commitment transaction. A commitment transaction (and the set of CETs that spend from it) only represents a state in the lifetime of the CFD. Parties come together before Olivia's next attestation and collaborate to create these new transactions which will be useful further into the future.
+
+When parties collaborate to roll over the CFD, creating its next state, they still need to make sure that the previous state is invalidated. All channel solutions need a mechanism like this. In this protocol we follow Generalized Bitcoin-Compatible Channels, so we ensure that publishing the commitment transaction reveals a publishing secret which the counterparty can use to activate a punishment path on the DLC output. The counterparty also needs a revocation secret, which is shared right after collaborating to update the state of the channel.
+
+With this new feature, both parties do need to be frequently online after the first rollover. They need to monitor for the presence of a revoked commitment transaction on-chain, which would be a cheating attempt from their counterparty, an attempt which they would be able to punish. Of course this could be delegated to a different component, but that would require trusting that third party. At the moment, Itchysats needs you to be online to ensure you're protected.
+** Itchysats' actual protocol
+The ability to keep the CFD alive is nice, but it is annoying to have to wait for hours to be able to close the contract. That could be the difference between realising a profit or taking a loss. This is just a limitation imposed by performing trustless blockchain protocols. Fortunately, we can relax this by introducing an /optional/ transaction which allows both parties to collaboratively close the contract before Olivia publishes an attestation.
+
+We call this a collaborative close transaction. It spends directly from the lock transaction. Both parties will have to agree on the payouts and will work together to build and sign it. On Itchysats we use the same payouts they would get based on the CETs they built and the current price of BTC.
+
+Obviously, neither party /has/ to comply. They can still rely on the mechanisms in place to settle the bet at a later time.
+
 * Demo (5 minutes)
 - Refer to wallet with funds
   Normally you'd have to fund the wallet
